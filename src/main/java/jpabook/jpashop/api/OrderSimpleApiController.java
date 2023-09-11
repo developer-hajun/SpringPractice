@@ -1,21 +1,18 @@
 package jpabook.jpashop.api;
 
 import jpabook.jpashop.domain.Address;
-import jpabook.jpashop.domain.Delivery;
 import jpabook.jpashop.domain.Order;
 import jpabook.jpashop.domain.OrderStatus;
 import jpabook.jpashop.repository.OrderRepository;
 import jpabook.jpashop.repository.OrderSearch;
-import jpabook.jpashop.service.OrderService;
+import jpabook.jpashop.repository.order.simpleQuery.OrderSimpleQueryRepository;
+import jpabook.jpashop.repository.order.simpleQuery.SimpleOrderQueryDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.antlr.v4.runtime.atn.SemanticContext;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.xml.transform.Result;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,7 +21,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class OrderSimpleApiController {
     private final OrderRepository orderRepository;
-
+    private final OrderSimpleQueryRepository orderSimpleQueryRepository;
     @GetMapping("/api/v1/simple-order")
     public List<Order> showOrderV1(){
         List<Order> allByString = orderRepository.findAllByString(new OrderSearch());
@@ -34,6 +31,7 @@ public class OrderSimpleApiController {
         }
         return allByString;
     }
+    //Entity를 그대로 json 형태로 노출
     @GetMapping("/api/v2/simple-order")
     public Result showOrderV2(){
         List<Order> allByString = orderRepository.findAllByString(new OrderSearch());
@@ -42,6 +40,23 @@ public class OrderSimpleApiController {
                 .collect(Collectors.toList());
         return new Result(collect);
     }
+    //DTO로 변환하여 JSON 형태로 노출 BUT N+1문제가 남아있음 WHY? LAZY형태로 join되기 때문에
+    @GetMapping("/api/v3/simple-order")
+    public Result showOrderV3(){
+        List<Order> allwithMemberDelivery = orderRepository.findAllwithMemberDelivery();
+        List<OrderDTO> collect = allwithMemberDelivery.stream()
+                .map(m -> new OrderDTO(m))
+                .collect(Collectors.toList());
+        return new Result(collect);
+    }
+    // v2에서 n+1번 문제를 패치 조인으로 한방 쿼리로 필요한 모든 객체를 들고와서 성능 최적화
+
+    @GetMapping("/api/v4/simple-order")
+    public List<SimpleOrderQueryDTO> showOrderV4(){
+        return orderSimpleQueryRepository.findOrderDTO();
+    }
+    //v4와 가져오는 데이터의 차이만 있을뿐이다 이떄 v3와 v4의 쿼리가 차이가 나기떄문에
+
     @Data
     static class OrderDTO{
         private Long OrderId;
