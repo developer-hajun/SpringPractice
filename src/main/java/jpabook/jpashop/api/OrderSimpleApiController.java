@@ -55,7 +55,7 @@ public class OrderSimpleApiController {
     public List<SimpleOrderQueryDTO> showOrderV4(){
         return orderSimpleQueryRepository.findOrderDTO();
     }
-    //v4와 가져오는 데이터의 차이만 있을뿐이다 이떄 v3와 v4의 쿼리가 차이가 나기떄문에
+    //v4와 가져오는 데이터의 차이만 있을뿐이다 이떄 v3와 v4의 쿼리가 차이가 나기떄문에 그렇기에 성능차이가 거의 없다.( join 할 테이블이 매우 많을때 사용)
 
     @Data
     static class OrderDTO{
