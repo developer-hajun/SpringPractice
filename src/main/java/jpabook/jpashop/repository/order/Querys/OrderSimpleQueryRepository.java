@@ -1,4 +1,4 @@
-package jpabook.jpashop.repository.order.simpleQuery;
+package jpabook.jpashop.repository.order.Querys;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +11,7 @@ import java.util.List;
 public class OrderSimpleQueryRepository {
     private final EntityManager em;
     public List<SimpleOrderQueryDTO> findOrderDTO() {
-        return em.createQuery("select new jpabook.jpashop.repository.order.simpleQuery.SimpleOrderQueryDTO(o.id,m.name,o.orderDate,o.status,d.address) from Order o join o.member m join o.delivery d",
+        return em.createQuery("select new jpabook.jpashop.repository.order.Querys.SimpleOrderQueryDTO(o.id,m.name,o.orderDate,o.status,d.address) from Order o join o.member m join o.delivery d",
                 SimpleOrderQueryDTO.class).getResultList();
     }
 }

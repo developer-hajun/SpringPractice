@@ -3,11 +3,12 @@ package jpabook.jpashop.api;
 import jpabook.jpashop.domain.*;
 import jpabook.jpashop.repository.OrderRepository;
 import jpabook.jpashop.repository.OrderSearch;
+import jpabook.jpashop.repository.order.Querys.OrderDTO;
+import jpabook.jpashop.repository.order.Querys.OrderQueryRepository;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.ast.Or;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 public class OrderApiController {
 
     private final OrderRepository orderRepository;
+    private final OrderQueryRepository orderQueryRepository;
 
     @GetMapping("/api/v1/order")
     public List<Order> ordersV1(){
@@ -50,6 +52,34 @@ public class OrderApiController {
                 .collect(Collectors.toList());
         return collect;
 
+    }
+    @GetMapping("/api/v3.1/order")
+    public List<OrderDTO> ordersV3_1(
+            @RequestParam(value = "offset",defaultValue = "0") int offset,
+            @RequestParam(value = "limit",defaultValue = "100") int limit
+            )
+    {
+        List<Order> allByString = orderRepository.findAllwithMemberDelivery(offset,limit);
+        for (Order order : allByString) {
+            System.out.println("order = "+order + " id = "+order.getId());
+        }
+        List<OrderDTO> collect = allByString.stream()
+                .map(OrderDTO::new)
+                .collect(Collectors.toList());
+        return collect;
+
+    }
+    @GetMapping("/api/v4/order")
+    public List<jpabook.jpashop.repository.order.Querys.OrderDTO> ordersV4()
+    {
+        List<jpabook.jpashop.repository.order.Querys.OrderDTO> allByString = orderQueryRepository.findOrderQueryDtos_optimization();
+        return allByString;
+    }
+    @GetMapping("/api/v5/order")
+    public List<jpabook.jpashop.repository.order.Querys.OrderDTO> ordersV5()
+    {
+        List<jpabook.jpashop.repository.order.Querys.OrderDTO> allByString = orderQueryRepository.findOrderQueryDtos();
+        return allByString;
     }
     @Data
     public class OrderDTO{
