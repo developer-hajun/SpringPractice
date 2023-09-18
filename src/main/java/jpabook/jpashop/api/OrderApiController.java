@@ -4,7 +4,10 @@ import jpabook.jpashop.domain.*;
 import jpabook.jpashop.repository.OrderRepository;
 import jpabook.jpashop.repository.OrderSearch;
 import jpabook.jpashop.repository.order.Querys.OrderDTO;
+import jpabook.jpashop.repository.order.Querys.OrderFlatDto;
 import jpabook.jpashop.repository.order.Querys.OrderQueryRepository;
+import jpabook.jpashop.service.Query.OrderDto;
+import jpabook.jpashop.service.Query.OrderQueryService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,16 +44,10 @@ public class OrderApiController {
                 .collect(Collectors.toList());
         return collect;
     }
+    private final OrderQueryService orderQueryService;
     @GetMapping("/api/v3/order")
-    public List<OrderDTO> ordersV3(){
-        List<Order> allByString = orderRepository.findAllWithByItem();
-        for (Order order : allByString) {
-            System.out.println("order = "+order + " id = "+order.getId());
-        }
-        List<OrderDTO> collect = allByString.stream()
-                .map(OrderDTO::new)
-                .collect(Collectors.toList());
-        return collect;
+    public List<OrderDto> ordersV3(){
+       return orderQueryService.ordersV3();
 
     }
     @GetMapping("/api/v3.1/order")
@@ -79,6 +76,13 @@ public class OrderApiController {
     public List<jpabook.jpashop.repository.order.Querys.OrderDTO> ordersV5()
     {
         List<jpabook.jpashop.repository.order.Querys.OrderDTO> allByString = orderQueryRepository.findOrderQueryDtos();
+        return allByString;
+    }
+    @GetMapping("/api/v6/order")
+    public List<OrderFlatDto> ordersV6()
+    {
+        List<OrderFlatDto> allByString = orderQueryRepository.findOrderQueryDtos_flat();
+
         return allByString;
     }
     @Data

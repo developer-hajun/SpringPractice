@@ -20,6 +20,18 @@ public class OrderQueryRepository {
                 "from Order o join o.member m join o.delivery d", OrderDTO.class).getResultList();
         return resultList;
     }
+
+
+    private List<OrderItemDTO> findOrderItems(Long id) {
+        return em.createQuery("select new jpabook.jpashop.repository.order.Querys.OrderItemDTO(oi.id,oi.item.name,oi.orderPrice,oi.count) " +
+                        "from OrderItem oi " +
+                        "join oi.item " +
+                        "where oi.order.id=:orderId ",
+                        OrderItemDTO.class)
+                .setParameter("orderId", id)
+                .getResultList();
+    }
+
     public List<OrderDTO> findOrderQueryDtos(){
         List<OrderDTO> orders = findOrders();
         orders.forEach(
@@ -33,7 +45,7 @@ public class OrderQueryRepository {
     public List<OrderDTO> findOrderQueryDtos_optimization(){
         List<OrderDTO> orders = findOrders();
         List<Long> orderId = orders.stream()
-                        .map(o->o.getId()).collect(Collectors.toList());
+                .map(o->o.getId()).collect(Collectors.toList());
         List<OrderItemDTO> orderId1 = em.createQuery("select new jpabook.jpashop.repository.order.Querys.OrderItemDTO(oi.id,oi.item.name,oi.orderPrice,oi.count) " +
                                 "from OrderItem oi " +
                                 "join oi.item " +
@@ -48,13 +60,14 @@ public class OrderQueryRepository {
         return orders;
     }
 
-    private List<OrderItemDTO> findOrderItems(Long id) {
-        return em.createQuery("select new jpabook.jpashop.repository.order.Querys.OrderItemDTO(oi.id,oi.item.name,oi.orderPrice,oi.count) " +
-                        "from OrderItem oi " +
-                        "join oi.item " +
-                        "where oi.order.id=:orderId ",
-                        OrderItemDTO.class)
-                .setParameter("orderId", id)
+    public List<OrderFlatDto> findOrderQueryDtos_flat() {
+        return em.createQuery("select new " +
+                "jpabook.jpashop.repository.order.Querys.OrderFlatDto(o.id,o.member.name,o.orderDate,o.status,o.delivery.address,i.name,oi.orderPrice,oi.count) " +
+                "from Order o " +
+                "join o.member m " +
+                "join o.delivery d " +
+                "join o.orderItems oi " +
+                "join oi.item i", OrderFlatDto.class)
                 .getResultList();
     }
 }

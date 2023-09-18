@@ -1,10 +1,14 @@
 package jpabook.jpashop.repository;
 
+import com.querydsl.core.types.EntityPath;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import jpabook.jpashop.domain.Order;
 
+import jpabook.jpashop.domain.QMember;
+import jpabook.jpashop.domain.QOrder;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
@@ -13,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-
 public class OrderRepository {
 
     private final EntityManager em;
